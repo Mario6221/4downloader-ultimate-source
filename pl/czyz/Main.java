@@ -81,10 +81,15 @@ public class Main {
             }
 
             for(String url: urls){
-                String thread[] = url.split(Pattern.quote("//"))[1].split(Pattern.quote("/"));
-                String board = thread[1];
-                String threadnumber = thread[3];
-                ThreadDownloader.getInstance().downloadThread(board,threadnumber);
+                try {
+                    String thread[] = url.split(Pattern.quote("//"))[1].split(Pattern.quote("/"));
+                    String board = thread[1];
+                    String threadnumber = thread[3];
+                    ThreadDownloader.getInstance().downloadThread(board,threadnumber);
+                }catch (ArrayIndexOutOfBoundsException e){
+                    if (!AttributesAndUtils.getInstance().isSilent())
+                        System.out.println("ERROR: "+url+" returned an error\n ERRMSG: "+e.getMessage());
+                }
             }
 
             if (line.hasOption("update")){

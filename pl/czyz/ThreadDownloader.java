@@ -19,16 +19,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 
-public final class ThreadDownloader {
+final class ThreadDownloader {
     final static private ThreadDownloader instance = new ThreadDownloader();
     final private AtomicInteger counter = new AtomicInteger(0);
     final private Object lock1 = new Object();
 
-    public synchronized AtomicInteger getCounter() {
+    synchronized AtomicInteger getCounter() {
         return counter;
     }
 
-    public synchronized Object getLock() {
+    synchronized Object getLock() {
         return lock1;
     }
 
@@ -36,15 +36,20 @@ public final class ThreadDownloader {
 
     }
 
-    public static ThreadDownloader getInstance(){
+    static ThreadDownloader getInstance(){
         return instance;
     }
 
-    public final void update(long timeout){
+    final void update(long timeout){
         File[] files = new File("Downloads//.temp").listFiles();
         String filename[];
-        if (files != null || timeout<15) {
-            assert files != null;
+        if (files != null) {
+            if (timeout<15){
+                if (!AttributesAndUtils.getInstance().isSilent()){
+                    System.out.println("Setting update timer on 15 min.");
+                }
+                timeout=15L;
+            }
             while (files.length!=0){
                 for(File file: files){
                     try {
@@ -52,10 +57,12 @@ public final class ThreadDownloader {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    filename = file.getName().split(Pattern.quote("!@#"));
-                    AttributesAndUtils.getInstance().setBoard(filename[0]);
-                    AttributesAndUtils.getInstance().setThreadnumber(filename[1].split(Pattern.quote("."))[0]);
-                    updateThread();
+                    if(file.getName().contains("!@#")) {
+                        filename = file.getName().split(Pattern.quote("!@#"));
+                        AttributesAndUtils.getInstance().setBoard(filename[0]);
+                        AttributesAndUtils.getInstance().setThreadnumber(filename[1].split(Pattern.quote("."))[0]);
+                        updateThread();
+                    }
                 }
                 for(int i=0;i<timeout;i++){
                     try {
@@ -77,6 +84,7 @@ public final class ThreadDownloader {
         }
     }
 
+    //black Box
     void downloadThread(String board,String threadnumber){
         AttributesAndUtils.getInstance().setBoard(board);
         AttributesAndUtils.getInstance().setThreadnumber(threadnumber);
@@ -96,7 +104,6 @@ public final class ThreadDownloader {
             e.printStackTrace();
         }
     }
-
     private String downloadJSON(URL url,File file) {
         try {
             new File("Downloads//.temp").mkdirs();
@@ -111,7 +118,6 @@ public final class ThreadDownloader {
         }
         return null;
     }
-
     private void downloadImages(JSONArray arr,int oldx) {
         int old = oldx;
         int num = arr.getJSONObject(0).getInt("images")+1;
@@ -138,7 +144,6 @@ public final class ThreadDownloader {
                 copy();
         }
     }
-
     private void copy(){
         try {
             Thread.sleep(2000);
@@ -148,7 +153,6 @@ public final class ThreadDownloader {
             e.printStackTrace();
         }
     }
-
     private void checkAndWait(int num,int old,String semUrl){
         int temp=counter.get();
         while(temp!=num){
@@ -191,7 +195,6 @@ public final class ThreadDownloader {
             return true;
         }
     }
-
     private int readOld(File f){
         if(f.isDirectory()){
             return f.listFiles().length;
@@ -200,8 +203,7 @@ public final class ThreadDownloader {
             return 0;
         }
     }
-
-    public List<String> downloadThreadList(String b,String regex){
+    List<String> downloadThreadList(String b, String regex){
         new File("Downloads//.temp2").mkdirs();
         List<String> result = new ArrayList<>();
         File file = new File("Downloads//.temp2//" + b + "catalog.json");

@@ -19,53 +19,53 @@ public final class AttributesAndUtils {
 
     }
 
-    public static AttributesAndUtils getInstance() {
+    static AttributesAndUtils getInstance() {
         return instance;
     }
 
-    public void setFlags(boolean less,boolean copyFlag){
+    void setFlags(boolean less, boolean copyFlag){
         this.less = less;
         this.copyFlag=copyFlag;
     }
 
-    public final boolean isSilent() {
+    final boolean isSilent() {
         return less;
     }
 
-    public final boolean isDestinationFlag() {
+    final boolean isDestinationFlag() {
         return destinationFlag;
     }
 
-    public final boolean isCopyFlag() {
+    final boolean isCopyFlag() {
         return copyFlag;
     }
 
-    public final String getDestination() {
+    final String getDestination() {
         return destination;
     }
 
-    public final String getBoard() {
+    final String getBoard() {
         return board;
     }
 
-    public final String getThreadnumber() {
+    final String getThreadnumber() {
         return threadnumber;
     }
 
-    public final void setDestination(String destination) {
+    final void setDestination(String destination) {
         this.destination = destination;
         this.destinationFlag=true;
     }
 
-    public final void setBoard(String board) {
+    final void setBoard(String board) {
         this.board = board;
     }
 
-    public final void setThreadnumber(String threadnumber) {
+    final void setThreadnumber(String threadnumber) {
         this.threadnumber = threadnumber;
     }
 
-    public final String readFile(String path, Charset encoding) throws IOException {
+    final String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
     }
